@@ -1,0 +1,14 @@
+plugins:
+  enable_amazon_sns_pns: true
+  amazon_sns_access_key_id:
+    default: ""
+    secret: true
+  amazon_sns_secret_access_key:
+    default: ""
+    secret: true
+  amazon_sns_region:
+    default: "us-east-1"
+  amazon_sns_apns_application_arn:
+    default: ""
+  amazon_sns_gcm_application_arn:
+    default: ""
