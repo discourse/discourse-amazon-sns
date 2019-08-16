@@ -8,7 +8,11 @@ module Jobs
       unread = args[:unread]
 
       user.amazon_sns_subscriptions.each do |subscription|
-        AmazonSnsHelper.publish(subscription.endpoint_arn, payload, unread)
+        if subscription.platform == "ios"
+          AmazonSnsHelper.publish_ios(subscription.endpoint_arn, payload, unread)
+        else
+          AmazonSnsHelper.publish_android(subscription.endpoint_arn, payload)
+        end
       end
     end
   end
