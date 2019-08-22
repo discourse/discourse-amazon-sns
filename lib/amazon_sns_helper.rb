@@ -64,9 +64,9 @@ class AmazonSnsHelper
         message: sns_payload.to_json,
         message_structure: "json"
       )
-    rescue Aws::SNS::Errors::EndpointDisabled =>
+    rescue Aws::SNS::Errors::EndpointDisabled => e
       # cleanup if the endpoint is disabled
-      # if user launches again, app should reattempt to subscribe
+      # if user launches again, app will reattempt to subscribe
       AmazonSnsSubscription.where(endpoint_arn: target_arn).destroy_all
       delete_endpoint(target_arn)
     end
@@ -97,10 +97,9 @@ class AmazonSnsHelper
         message: sns_payload.to_json,
         message_structure: "json"
       )
-    rescue Aws::SNS::Errors::EndpointDisabled =>
+    rescue Aws::SNS::Errors::EndpointDisabled => e
       # cleanup if the endpoint is disabled
-      # if user launches again, app should reattempt to subscribe
-
+      # if user launches again, app will reattempt to subscribe
       AmazonSnsSubscription.where(endpoint_arn: target_arn).destroy_all
       delete_endpoint(target_arn)
     end
