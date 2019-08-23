@@ -6,6 +6,7 @@ require File.expand_path("../../../lib/amazon_sns_helper.rb", __FILE__)
 RSpec.describe AmazonSnsSubscriptionController do
 
   let(:user) { Fabricate(:user) }
+  let(:user2) { Fabricate(:user) }
 
   context '#create' do
     before do
@@ -51,10 +52,9 @@ RSpec.describe AmazonSnsSubscriptionController do
 
     it 'replaces a disabled endpoint with a new one' do
       AmazonSnsHelper.expects(:get_endpoint_attributes).with("sample:arn2")
-        .returns(attributes: { 'Enabled' => 'false' })
+        .returns('Enabled' => 'false')
 
       AmazonSnsHelper.expects(:delete_endpoint).with("sample:arn2")
-
       AmazonSnsHelper.expects(:create_endpoint).returns("updated_arn")
 
       AmazonSnsSubscription.create!(
@@ -77,5 +77,34 @@ RSpec.describe AmazonSnsSubscriptionController do
       expect(lastSubscription.device_token).to eq("some_token")
       expect(lastSubscription.endpoint_arn).to eq("updated_arn")
     end
+
+    it 'replaces user id associated with endpoint if different from existing user id' do
+      AmazonSnsHelper.expects(:get_endpoint_attributes).with("testing:arn")
+        .returns('Enabled' => 'true')
+
+      AmazonSnsSubscription.create!(
+        user_id: user.id,
+        device_token: "unique_app_token",
+        application_name: "application_name",
+        platform: "ios",
+        endpoint_arn: "testing:arn"
+      )
+
+      sign_in(user2)
+
+      post '/amazon-sns/subscribe.json', params: {
+        token: "unique_app_token",
+        application_name: "application_name",
+        platform: "ios"
+      }
+
+      expect(response.status).to eq(200)
+      lastSubscription = AmazonSnsSubscription.last
+
+      expect(lastSubscription.device_token).to eq("unique_app_token")
+      expect(lastSubscription.user_id).to eq(user2.id)
+      expect(lastSubscription.endpoint_arn).to eq("testing:arn")
+    end
+
   end
 end
