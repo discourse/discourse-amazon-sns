@@ -69,6 +69,11 @@ class AmazonSnsHelper
       # if user launches again, app will reattempt to subscribe
       AmazonSnsSubscription.where(endpoint_arn: target_arn).destroy_all
       delete_endpoint(target_arn)
+    rescue Aws::SNS::Errors::InvalidParameter => e
+      if e.message =~ /TargetArn/
+        # somehow we have a wrong target_arn, cleanup locally only
+        AmazonSnsSubscription.where(endpoint_arn: target_arn).destroy_all
+      end
     end
 
   end
@@ -102,6 +107,11 @@ class AmazonSnsHelper
       # if user launches again, app will reattempt to subscribe
       AmazonSnsSubscription.where(endpoint_arn: target_arn).destroy_all
       delete_endpoint(target_arn)
+    rescue Aws::SNS::Errors::InvalidParameter => e
+      if e.message =~ /TargetArn/
+        # somehow we have a wrong target_arn, cleanup locally only
+        AmazonSnsSubscription.where(endpoint_arn: target_arn).destroy_all
+      end
     end
 
   end
