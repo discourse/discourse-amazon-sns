@@ -1,0 +1,8 @@
+en:
+  site_settings:
+    enable_amazon_sns_pns: "Enable Push Notifications via Amazon SNS."
+    amazon_sns_access_key_id: "Enter the Amazon access key id that has permissions to send SNS messages."
+    amazon_sns_secret_access_key: "Enter the Amazon secret access key."
+    amazon_sns_region: "Enter the AWS region for your SNS Push Notification service, e.g. 'us-east-1'."
+    amazon_sns_apns_application_arn: "Enter the ARN for a platform application you have created for Apple iOS."
+    amazon_sns_gcm_application_arn: "Enter the ARN for a platform application you have created for Google's Firebase Cloud Messaging (FCM)."
