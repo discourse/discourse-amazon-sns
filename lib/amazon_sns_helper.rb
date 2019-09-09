@@ -4,11 +4,17 @@ require 'aws-sdk-sns'
 
 class AmazonSnsHelper
   def self.sns_client(client = nil)
-    @client = client || Aws::SNS::Client.new(
-      access_key_id: SiteSetting.amazon_sns_access_key_id,
-      secret_access_key: SiteSetting.amazon_sns_secret_access_key,
-      region: SiteSetting.amazon_sns_region
-    )
+    opts = {}
+
+    if SiteSetting.amazon_sns_secret_access_key && SiteSetting.amazon_sns_access_key_id
+      opts[:access_key_id] = SiteSetting.amazon_sns_access_key_id
+      opts[:secret_access_key] = SiteSetting.amazon_sns_secret_access_key
+    end
+
+    opts[:region] = SiteSetting.amazon_sns_region if SiteSetting.amazon_sns_region
+
+    @client = client || Aws::SNS::Client.new(opts)
+
   end
 
   def self.create_endpoint(token: "", platform: "ios")
@@ -136,7 +142,7 @@ class AmazonSnsHelper
   end
 
   def self.test_publish_android
-    target_arn = "arn:aws:sns:us-east-1:638650587766:endpoint/GCM/IgniteAndroid/19b6d49e-5a42-3bfb-8df9-e38d7a1eadb4"
+    target_arn = "arn:aws:sns:us-east-1:638650587766:endpoint/GCM/IgniteAndroid/b517d11d-f5e4-34bc-9c7e-1d36c77f5a72"
     android_notification = {
       data: {
         message: "@user1: Hey there Android dude",

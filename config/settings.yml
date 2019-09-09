@@ -7,7 +7,7 @@ plugins:
     default: ""
     secret: true
   amazon_sns_region:
-    default: "us-east-1"
+    default: ""
   amazon_sns_apns_application_arn:
     default: ""
   amazon_sns_gcm_application_arn:
