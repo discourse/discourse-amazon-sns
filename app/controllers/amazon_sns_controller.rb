@@ -15,7 +15,7 @@ class ::AmazonSnsSubscriptionController < ::ApplicationController
 
     if record = AmazonSnsSubscription.where(device_token: token).first
       endpoint_attrs = AmazonSnsHelper.get_endpoint_attributes(record.endpoint_arn)
-      if endpoint_attrs["Enabled"] == "true"
+      if endpoint_attrs && endpoint_attrs["Enabled"] == "true"
         existing_record = true
         if record.user_id != current_user.id
           record.update(user_id: current_user.id)

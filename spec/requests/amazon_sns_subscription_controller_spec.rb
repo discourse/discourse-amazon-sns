@@ -11,6 +11,7 @@ RSpec.describe AmazonSnsSubscriptionController do
   context '#create' do
     before do
       SiteSetting.enable_amazon_sns_pns = true
+      SiteSetting.amazon_sns_region = "us-east-1"
       SiteSetting.amazon_sns_access_key_id = "access_key_id"
       SiteSetting.amazon_sns_secret_access_key = "secret_key"
       SiteSetting.amazon_sns_apns_application_arn = "test_apple_arn"
@@ -53,6 +54,34 @@ RSpec.describe AmazonSnsSubscriptionController do
     it 'replaces a disabled endpoint with a new one' do
       AmazonSnsHelper.expects(:get_endpoint_attributes).with("sample:arn2")
         .returns('Enabled' => 'false')
+
+      AmazonSnsHelper.expects(:delete_endpoint).with("sample:arn2")
+      AmazonSnsHelper.expects(:create_endpoint).returns("updated_arn")
+
+      AmazonSnsSubscription.create!(
+        user_id: user.id,
+        device_token: "some_token",
+        application_name: "application_name",
+        platform: "ios",
+        endpoint_arn: "sample:arn2"
+      )
+
+      post '/amazon-sns/subscribe.json', params: {
+        token: "some_token",
+        application_name: "application_name",
+        platform: "ios"
+      }
+
+      expect(response.status).to eq(200)
+      lastSubscription = AmazonSnsSubscription.last
+
+      expect(lastSubscription.device_token).to eq("some_token")
+      expect(lastSubscription.endpoint_arn).to eq("updated_arn")
+    end
+
+    it 'replaces an endpoint from wrong region with a new one' do
+      AmazonSnsHelper.expects(:get_endpoint_attributes).with("sample:arn2")
+        .returns(false)
 
       AmazonSnsHelper.expects(:delete_endpoint).with("sample:arn2")
       AmazonSnsHelper.expects(:create_endpoint).returns("updated_arn")

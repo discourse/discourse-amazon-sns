@@ -28,7 +28,8 @@ class AmazonSnsHelper
         token: token
       )
     rescue Aws::SNS::Errors::ServiceError => e
-      return render json: { errors: [e.message] }, status: 422
+      Rails.logger.error(e)
+      return false
     end
 
     response.endpoint_arn
@@ -38,7 +39,8 @@ class AmazonSnsHelper
     begin
       resp = sns_client.get_endpoint_attributes(endpoint_arn: arn)
     rescue Aws::SNS::Errors::ServiceError => e
-      return render json: { errors: [e.message] }, status: 422
+      Rails.logger.error(e)
+      return false
     end
     resp.attributes
   end
