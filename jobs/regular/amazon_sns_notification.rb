@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Jobs
-  class AmazonSnsNotification < Jobs::Base
+  class AmazonSnsNotification < ::Jobs::Base
     def execute(args)
       user = User.find_by(id: args[:user_id])
       payload = args[:payload]
