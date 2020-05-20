@@ -7,7 +7,6 @@
 # url: https://github.com/discourse/discourse-amazon-sns
 
 enabled_site_setting :enable_amazon_sns_pns
-enabled_site_setting_filter :amazon_sns
 
 after_initialize do
   require File.expand_path("../app/models/amazon_sns_subscription.rb", __FILE__)
