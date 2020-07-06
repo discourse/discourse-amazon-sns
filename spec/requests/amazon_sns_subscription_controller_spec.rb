@@ -63,7 +63,8 @@ RSpec.describe AmazonSnsSubscriptionController do
         device_token: "some_token",
         application_name: "application_name",
         platform: "ios",
-        endpoint_arn: "sample:arn2"
+        endpoint_arn: "sample:arn2",
+        enabled: 1
       )
 
       post '/amazon-sns/subscribe.json', params: {
@@ -91,7 +92,8 @@ RSpec.describe AmazonSnsSubscriptionController do
         device_token: "some_token",
         application_name: "application_name",
         platform: "ios",
-        endpoint_arn: "sample:arn2"
+        endpoint_arn: "sample:arn2",
+        enabled: 1
       )
 
       post '/amazon-sns/subscribe.json', params: {
@@ -116,7 +118,8 @@ RSpec.describe AmazonSnsSubscriptionController do
         device_token: "unique_app_token",
         application_name: "application_name",
         platform: "ios",
-        endpoint_arn: "testing:arn"
+        endpoint_arn: "testing:arn",
+        enabled: 1
       )
 
       sign_in(user2)

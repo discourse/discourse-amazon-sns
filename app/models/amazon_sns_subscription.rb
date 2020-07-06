@@ -16,6 +16,7 @@ end
 #  endpoint_arn     :string           not null
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
+#  enabled          :integer          not null
 #
 # Indexes
 #
