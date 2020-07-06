@@ -73,9 +73,9 @@ class AmazonSnsHelper
         message_structure: "json"
       )
     rescue Aws::SNS::Errors::EndpointDisabled => e
-      # cleanup if the endpoint is disabled
-      # if user launches again, app will reattempt to subscribe
-      AmazonSnsSubscription.where(endpoint_arn: target_arn).destroy_all
+      # mark local record disabled, only used for statistical purposes
+      # if user launches again, app will delete row and resubscribe in SNS
+      AmazonSnsSubscription.where(endpoint_arn: target_arn).update_all(enabled: 0)
       delete_endpoint(target_arn)
     rescue Aws::SNS::Errors::InvalidParameter => e
       if e.message =~ /TargetArn/
@@ -111,9 +111,9 @@ class AmazonSnsHelper
         message_structure: "json"
       )
     rescue Aws::SNS::Errors::EndpointDisabled => e
-      # cleanup if the endpoint is disabled
-      # if user launches again, app will reattempt to subscribe
-      AmazonSnsSubscription.where(endpoint_arn: target_arn).destroy_all
+      # mark local record disabled, only used for statistical purposes
+      # if user launches again, app will delete row and resubscribe in SNS
+      AmazonSnsSubscription.where(endpoint_arn: target_arn).update_all(enabled: 0)
       delete_endpoint(target_arn)
     rescue Aws::SNS::Errors::InvalidParameter => e
       if e.message =~ /TargetArn/
