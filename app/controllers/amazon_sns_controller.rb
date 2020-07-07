@@ -38,8 +38,7 @@ class ::AmazonSnsSubscriptionController < ::ApplicationController
         device_token: token,
         application_name: application_name,
         platform: platform,
-        endpoint_arn: endpoint_arn,
-        enabled: 1
+        endpoint_arn: endpoint_arn
       )
     end
 

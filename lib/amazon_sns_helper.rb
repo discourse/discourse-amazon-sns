@@ -75,12 +75,12 @@ class AmazonSnsHelper
     rescue Aws::SNS::Errors::EndpointDisabled => e
       # mark local record disabled, only used for statistical purposes
       # if user launches again, app will delete row and resubscribe in SNS
-      AmazonSnsSubscription.where(endpoint_arn: target_arn).update_all(enabled: 0)
+      disable_arn_subscriptions(target_arn)
       delete_endpoint(target_arn)
     rescue Aws::SNS::Errors::InvalidParameter => e
       if e.message =~ /TargetArn/
         # somehow we have a wrong target_arn, cleanup locally only
-        AmazonSnsSubscription.where(endpoint_arn: target_arn).destroy_all
+        destroy_arn_subscriptions(target_arn)
       end
     end
 
@@ -113,15 +113,26 @@ class AmazonSnsHelper
     rescue Aws::SNS::Errors::EndpointDisabled => e
       # mark local record disabled, only used for statistical purposes
       # if user launches again, app will delete row and resubscribe in SNS
-      AmazonSnsSubscription.where(endpoint_arn: target_arn).update_all(enabled: 0)
+      disable_arn_subscriptions(target_arn)
       delete_endpoint(target_arn)
     rescue Aws::SNS::Errors::InvalidParameter => e
       if e.message =~ /TargetArn/
         # somehow we have a wrong target_arn, cleanup locally only
-        AmazonSnsSubscription.where(endpoint_arn: target_arn).destroy_all
+        destroy_arn_subscriptions(target_arn)
       end
     end
+  end
 
+  def self.disable_arn_subscriptions(target_arn)
+    AmazonSnsSubscription.where(endpoint_arn: target_arn)
+                         .update_all(
+                           status: AmazonSnsSubscription.statuses[:disabled],
+                           status_changed_at: Time.zone.now
+                         )
+  end
+
+  def self.destroy_arn_subscriptions(target_arn)
+    AmazonSnsSubscription.where(endpoint_arn: target_arn).destroy_all
   end
 
   def self.test_publish_ios

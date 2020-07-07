@@ -63,8 +63,7 @@ RSpec.describe AmazonSnsSubscriptionController do
         device_token: "some_token",
         application_name: "application_name",
         platform: "ios",
-        endpoint_arn: "sample:arn2",
-        enabled: 1
+        endpoint_arn: "sample:arn2"
       )
 
       post '/amazon-sns/subscribe.json', params: {
@@ -78,6 +77,7 @@ RSpec.describe AmazonSnsSubscriptionController do
 
       expect(lastSubscription.device_token).to eq("some_token")
       expect(lastSubscription.endpoint_arn).to eq("updated_arn")
+      expect(lastSubscription.status).to eq(AmazonSnsSubscription.statuses[:enabled])
     end
 
     it 'replaces an endpoint from wrong region with a new one' do
@@ -92,8 +92,7 @@ RSpec.describe AmazonSnsSubscriptionController do
         device_token: "some_token",
         application_name: "application_name",
         platform: "ios",
-        endpoint_arn: "sample:arn2",
-        enabled: 1
+        endpoint_arn: "sample:arn2"
       )
 
       post '/amazon-sns/subscribe.json', params: {
@@ -105,6 +104,7 @@ RSpec.describe AmazonSnsSubscriptionController do
       expect(response.status).to eq(200)
       lastSubscription = AmazonSnsSubscription.last
 
+      expect(lastSubscription.status).to eq(AmazonSnsSubscription.statuses[:enabled])
       expect(lastSubscription.device_token).to eq("some_token")
       expect(lastSubscription.endpoint_arn).to eq("updated_arn")
     end
@@ -118,8 +118,7 @@ RSpec.describe AmazonSnsSubscriptionController do
         device_token: "unique_app_token",
         application_name: "application_name",
         platform: "ios",
-        endpoint_arn: "testing:arn",
-        enabled: 1
+        endpoint_arn: "testing:arn"
       )
 
       sign_in(user2)
@@ -136,6 +135,7 @@ RSpec.describe AmazonSnsSubscriptionController do
       expect(lastSubscription.device_token).to eq("unique_app_token")
       expect(lastSubscription.user_id).to eq(user2.id)
       expect(lastSubscription.endpoint_arn).to eq("testing:arn")
+      expect(lastSubscription.status).to eq(AmazonSnsSubscription.statuses[:enabled])
     end
 
   end
