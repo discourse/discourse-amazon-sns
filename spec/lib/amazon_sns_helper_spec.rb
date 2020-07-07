@@ -61,8 +61,4 @@ RSpec.describe AmazonSnsHelper do
       expect(AmazonSnsSubscription.find_by(id: subscription.id)).to eq(nil)
     end
   end
-
-  def mock_publish
-    Aws::SNS::Client.any_instance.expects(:publish).returns(mock_response).at_least(1)
-  end
 end
