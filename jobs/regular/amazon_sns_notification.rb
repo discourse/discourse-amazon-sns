@@ -8,7 +8,7 @@ module Jobs
       unread = args[:unread]
 
       user.amazon_sns_subscriptions.each do |subscription|
-        next if subscription.enabled == 0
+        next if subscription.status == AmazonSnsSubscription.statuses[:disabled]
 
         if subscription.platform == "ios"
           AmazonSnsHelper.publish_ios(subscription.endpoint_arn, payload, unread)
