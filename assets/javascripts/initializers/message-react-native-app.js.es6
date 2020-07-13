@@ -1,5 +1,4 @@
 import { ajax } from "discourse/lib/ajax";
-import { popupAjaxError } from "discourse/lib/ajax-error";
 import { isAppWebview, postRNWebviewMessage } from "discourse/lib/utilities";
 import User from "discourse/models/user";
 
@@ -8,13 +7,13 @@ export default {
   after: "inject-objects",
 
   initialize(container) {
-    const currentUser = Discourse.User.current();
+    const currentUser = container.lookup("current-user:main");
 
     if (isAppWebview() && currentUser) {
       postRNWebviewMessage("authenticated", 1);
 
       let appEvents = container.lookup("app-events:main");
-      appEvents.on("page:changed", data => {
+      appEvents.on("page:changed", (data) => {
         let badgeCount =
           currentUser.unread_notifications +
           currentUser.unread_private_messages;
@@ -33,15 +32,15 @@ export default {
           data: {
             token: token,
             platform: platform,
-            application_name: application_name
-          }
-        }).then(result => {
+            application_name: application_name,
+          },
+        }).then((result) => {
           // Note: might need to send endpoint_arn status to app
           // if (result.endpoint_arn && result.device_token) {
           postRNWebviewMessage("subscribe completed", result.endpoint_arn);
           // }
         });
-      }
+      },
     });
-  }
+  },
 };
