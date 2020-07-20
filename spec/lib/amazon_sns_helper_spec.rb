@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe AmazonSnsHelper do
   fab!(:user) { Fabricate(:user) }
-  let!(:subscription) do 
+  let!(:subscription) do
     AmazonSnsSubscription.create!(
       user_id: user.id,
       device_token: "some_token",
@@ -17,8 +17,11 @@ RSpec.describe AmazonSnsHelper do
 
   before do
     SiteSetting.amazon_sns_region = 'us-west-2'
+    SiteSetting.amazon_sns_access_key_id = "access_key_id"
+    SiteSetting.amazon_sns_secret_access_key = "secret_key"
+    SiteSetting.amazon_sns_apns_application_arn = "test_apple_arn"
   end
-  
+
   context "when the SNS endpoint has been disabled" do
     before do
       Aws::SNS::Client.any_instance.expects(:publish).raises(
