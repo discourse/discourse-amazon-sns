@@ -8,26 +8,26 @@ RSpec.describe AmazonSnsSubscriptionController do
   let(:user) { Fabricate(:user) }
   let(:user2) { Fabricate(:user) }
 
-  context '#create' do
-    before do
-      SiteSetting.enable_amazon_sns_pns = true
-      SiteSetting.amazon_sns_region = "us-east-1"
-      SiteSetting.amazon_sns_access_key_id = "access_key_id"
-      SiteSetting.amazon_sns_secret_access_key = "secret_key"
-      SiteSetting.amazon_sns_apns_application_arn = "test_apple_arn"
+  before do
+    SiteSetting.enable_amazon_sns_pns = true
+    SiteSetting.amazon_sns_region = "us-east-1"
+    SiteSetting.amazon_sns_access_key_id = "access_key_id"
+    SiteSetting.amazon_sns_secret_access_key = "secret_key"
+    SiteSetting.amazon_sns_apns_application_arn = "test_apple_arn"
 
-      sign_in(user)
-    end
-
-    it 'creates a new subscription' do
-      Aws.config[:sns] = {
-        stub_responses: {
-          create_platform_endpoint: {
-            endpoint_arn: "sample:arn"
-          }
+    Aws.config[:sns] = {
+      stub_responses: {
+        create_platform_endpoint: {
+          endpoint_arn: "sample:arn"
         }
       }
+    }
 
+    sign_in(user)
+  end
+
+  context '#create' do
+    it 'creates a new subscription' do
       post '/amazon-sns/subscribe.json', params: {
         token: "123123123123",
         application_name: "Penar's phone",
@@ -139,6 +139,33 @@ RSpec.describe AmazonSnsSubscriptionController do
       expect(lastSubscription.endpoint_arn).to eq("testing:arn")
       expect(lastSubscription.status).to eq(AmazonSnsSubscription.statuses[:enabled])
     end
+  end
 
+  context '#disable' do
+    it 'marks a subscription as disabled' do
+      post '/amazon-sns/subscribe.json', params: {
+        token: "123123123123",
+        application_name: "Penar's phone",
+        platform: "ios"
+      }
+
+      expect(response.status).to eq(200)
+
+      post '/amazon-sns/disable.json', params: {
+        token: "123123123123",
+      }
+
+      expect(response.status).to eq(200)
+      json = JSON.parse(response.body)
+      expect(json["status"]).to eq(AmazonSnsSubscription.statuses[:disabled])
+    end
+
+    it 'fails when token does not match' do
+      post '/amazon-sns/disable.json', params: {
+        token: "no-bueno",
+      }
+
+      expect(response.status).to eq(404)
+    end
   end
 end

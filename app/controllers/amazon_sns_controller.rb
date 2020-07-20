@@ -45,4 +45,19 @@ class ::AmazonSnsSubscriptionController < ::ApplicationController
 
     render json: record
   end
+
+  def disable
+    token = params.require(:token)
+    if record = AmazonSnsSubscription.where(device_token: token).first
+      record.update(
+        status: AmazonSnsSubscription.statuses[:disabled],
+        status_changed_at: Time.zone.now
+      )
+
+      render json: record
+      return
+    end
+
+    raise Discourse::NotFound
+  end
 end

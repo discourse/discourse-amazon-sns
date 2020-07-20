@@ -16,6 +16,7 @@ after_initialize do
 
   Discourse::Application.routes.append do
     post '/amazon-sns/subscribe' => "amazon_sns_subscription#create"
+    post '/amazon-sns/disable' => "amazon_sns_subscription#disable"
   end
 
   User.class_eval do

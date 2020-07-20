@@ -22,9 +22,7 @@ export default {
       });
     }
 
-    // called by webview if
-    // 1. user is authenticated
-    // 2. user has accepted push notifications
+    // TODO: remove this legacy call in December 2020 (app should use window.SNS calls below)
     User.reopenClass({
       subscribeDeviceToken(token, platform, application_name) {
         ajax("/amazon-sns/subscribe.json", {
@@ -35,12 +33,35 @@ export default {
             application_name: application_name,
           },
         }).then((result) => {
-          // Note: might need to send endpoint_arn status to app
-          // if (result.endpoint_arn && result.device_token) {
           postRNWebviewMessage("subscribe completed", result.endpoint_arn);
-          // }
         });
       },
     });
+
+    // called by webview
+    window.SNS = {
+      subscribeDeviceToken(token, platform, application_name) {
+        ajax("/amazon-sns/subscribe.json", {
+          type: "POST",
+          data: {
+            token: token,
+            platform: platform,
+            application_name: application_name,
+          },
+        }).then((result) => {
+          postRNWebviewMessage("subscribedToken", result);
+        });
+      },
+      disableToken(token) {
+        ajax("/amazon-sns/disable.json", {
+          type: "POST",
+          data: {
+            token: token,
+          },
+        }).then((result) => {
+          postRNWebviewMessage("disabledToken", result);
+        });
+      },
+    };
   },
 };
