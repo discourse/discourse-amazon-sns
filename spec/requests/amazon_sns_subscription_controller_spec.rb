@@ -35,6 +35,8 @@ RSpec.describe AmazonSnsSubscriptionController do
       }
 
       expect(response.status).to eq(200)
+      json = JSON.parse(response.body)
+      expect(Time.parse(json["status_changed_at"])).to be_within(10.seconds).of Time.now
       expect(user.amazon_sns_subscriptions.length).to eq(1)
     end
 

@@ -38,7 +38,8 @@ class ::AmazonSnsSubscriptionController < ::ApplicationController
         device_token: token,
         application_name: application_name,
         platform: platform,
-        endpoint_arn: endpoint_arn
+        endpoint_arn: endpoint_arn,
+        status_changed_at: Time.zone.now
       )
     end
 
