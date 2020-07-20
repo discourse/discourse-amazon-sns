@@ -139,6 +139,34 @@ RSpec.describe AmazonSnsSubscriptionController do
       expect(lastSubscription.endpoint_arn).to eq("testing:arn")
       expect(lastSubscription.status).to eq(AmazonSnsSubscription.statuses[:enabled])
     end
+
+    it 'updates a disabled subscription, reenabling it' do
+      token = "test123";
+
+      post '/amazon-sns/subscribe.json', params: {
+        token: token,
+        application_name: "Penar's phone",
+        platform: "ios"
+      }
+      expect(response.status).to eq(200)
+
+      post '/amazon-sns/disable.json', params: {token: token}
+      expect(response.status).to eq(200)
+      json = JSON.parse(response.body)
+      expect(json["status"]).to eq(AmazonSnsSubscription.statuses[:disabled])
+
+      AmazonSnsHelper.expects(:get_endpoint_attributes).with("sample:arn")
+        .returns('Enabled' => 'true')
+
+        post '/amazon-sns/subscribe.json', params: {
+        token: token,
+        application_name: "Penar's phone",
+        platform: "ios"
+      }
+      expect(response.status).to eq(200)
+      final_json = JSON.parse(response.body)
+      expect(final_json["status"]).to eq(AmazonSnsSubscription.statuses[:enabled])
+    end
   end
 
   context '#disable' do
