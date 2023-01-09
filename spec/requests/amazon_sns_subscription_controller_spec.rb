@@ -150,7 +150,7 @@ RSpec.describe AmazonSnsSubscriptionController do
       }
       expect(response.status).to eq(200)
 
-      post '/amazon-sns/disable.json', params: {token: token}
+      post '/amazon-sns/disable.json', params: { token: token }
       expect(response.status).to eq(200)
       json = JSON.parse(response.body)
       expect(json["status"]).to eq(AmazonSnsSubscription.statuses[:disabled])

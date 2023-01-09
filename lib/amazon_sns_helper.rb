@@ -124,10 +124,10 @@ class AmazonSnsHelper
 
   def self.disable_arn_subscriptions(target_arn)
     AmazonSnsSubscription.where(endpoint_arn: target_arn)
-                         .update_all(
-                           status: AmazonSnsSubscription.statuses[:disabled],
-                           status_changed_at: Time.zone.now
-                         )
+      .update_all(
+        status: AmazonSnsSubscription.statuses[:disabled],
+        status_changed_at: Time.zone.now
+      )
   end
 
   def self.destroy_arn_subscriptions(target_arn)
