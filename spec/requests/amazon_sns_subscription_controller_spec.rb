@@ -26,7 +26,7 @@ RSpec.describe AmazonSnsSubscriptionController do
     sign_in(user)
   end
 
-  context '#create' do
+  describe '#create' do
     it 'creates a new subscription' do
       post '/amazon-sns/subscribe.json', params: {
         token: "123123123123",
@@ -141,7 +141,7 @@ RSpec.describe AmazonSnsSubscriptionController do
     end
 
     it 'updates a disabled subscription, reenabling it' do
-      token = "test123";
+      token = "test123"
 
       post '/amazon-sns/subscribe.json', params: {
         token: token,
@@ -169,7 +169,7 @@ RSpec.describe AmazonSnsSubscriptionController do
     end
 
     it 'handles not found endpoint' do
-      token = "test123";
+      token = "test123"
 
       post '/amazon-sns/subscribe.json', params: {
         token: token,
@@ -196,7 +196,7 @@ RSpec.describe AmazonSnsSubscriptionController do
     end
   end
 
-  context '#disable' do
+  describe '#disable' do
     it 'marks a subscription as disabled' do
       post '/amazon-sns/subscribe.json', params: {
         token: "123123123123",
