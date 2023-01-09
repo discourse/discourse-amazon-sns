@@ -38,8 +38,7 @@ class AmazonSnsHelper
   def self.get_endpoint_attributes(arn)
     begin
       resp = sns_client.get_endpoint_attributes(endpoint_arn: arn)
-    rescue Aws::SNS::Errors::ServiceError => e
-      Rails.logger.error(e)
+    rescue Aws::SNS::Errors::ServiceError
       return false
     end
     resp.attributes

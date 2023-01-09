@@ -158,13 +158,40 @@ RSpec.describe AmazonSnsSubscriptionController do
       AmazonSnsHelper.expects(:get_endpoint_attributes).with("sample:arn")
         .returns('Enabled' => 'true')
 
-        post '/amazon-sns/subscribe.json', params: {
+      post '/amazon-sns/subscribe.json', params: {
         token: token,
         application_name: "Penar's phone",
         platform: "ios"
       }
       expect(response.status).to eq(200)
       final_json = JSON.parse(response.body)
+      expect(final_json["status"]).to eq(AmazonSnsSubscription.statuses[:enabled])
+    end
+
+    it 'handles not found endpoint' do
+      token = "test123";
+
+      post '/amazon-sns/subscribe.json', params: {
+        token: token,
+        application_name: "Penar's phone",
+        platform: "ios"
+      }
+      expect(response.status).to eq(200)
+
+      Aws::SNS::Client.any_instance.expects(:get_endpoint_attributes).with(
+        endpoint_arn: "sample:arn"
+      ).raises(
+        Aws::SNS::Errors::ServiceError.new(stub, "Endpoint does not exist")
+      )
+
+      post '/amazon-sns/subscribe.json', params: {
+        token: token,
+        application_name: "Penar's phone",
+        platform: "ios"
+      }
+      expect(response.status).to eq(200)
+      final_json = JSON.parse(response.body)
+
       expect(final_json["status"]).to eq(AmazonSnsSubscription.statuses[:enabled])
     end
   end
