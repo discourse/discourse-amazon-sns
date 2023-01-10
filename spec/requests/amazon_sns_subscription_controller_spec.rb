@@ -26,7 +26,7 @@ RSpec.describe AmazonSnsSubscriptionController do
     sign_in(user)
   end
 
-  context '#create' do
+  describe '#create' do
     it 'creates a new subscription' do
       post '/amazon-sns/subscribe.json', params: {
         token: "123123123123",
@@ -141,7 +141,7 @@ RSpec.describe AmazonSnsSubscriptionController do
     end
 
     it 'updates a disabled subscription, reenabling it' do
-      token = "test123";
+      token = "test123"
 
       post '/amazon-sns/subscribe.json', params: {
         token: token,
@@ -150,7 +150,7 @@ RSpec.describe AmazonSnsSubscriptionController do
       }
       expect(response.status).to eq(200)
 
-      post '/amazon-sns/disable.json', params: {token: token}
+      post '/amazon-sns/disable.json', params: { token: token }
       expect(response.status).to eq(200)
       json = JSON.parse(response.body)
       expect(json["status"]).to eq(AmazonSnsSubscription.statuses[:disabled])
@@ -158,7 +158,7 @@ RSpec.describe AmazonSnsSubscriptionController do
       AmazonSnsHelper.expects(:get_endpoint_attributes).with("sample:arn")
         .returns('Enabled' => 'true')
 
-        post '/amazon-sns/subscribe.json', params: {
+      post '/amazon-sns/subscribe.json', params: {
         token: token,
         application_name: "Penar's phone",
         platform: "ios"
@@ -167,9 +167,36 @@ RSpec.describe AmazonSnsSubscriptionController do
       final_json = JSON.parse(response.body)
       expect(final_json["status"]).to eq(AmazonSnsSubscription.statuses[:enabled])
     end
+
+    it 'handles not found endpoint' do
+      token = "test123"
+
+      post '/amazon-sns/subscribe.json', params: {
+        token: token,
+        application_name: "Penar's phone",
+        platform: "ios"
+      }
+      expect(response.status).to eq(200)
+
+      Aws::SNS::Client.any_instance.expects(:get_endpoint_attributes).with(
+        endpoint_arn: "sample:arn"
+      ).raises(
+        Aws::SNS::Errors::ServiceError.new(stub, "Endpoint does not exist")
+      )
+
+      post '/amazon-sns/subscribe.json', params: {
+        token: token,
+        application_name: "Penar's phone",
+        platform: "ios"
+      }
+      expect(response.status).to eq(200)
+      final_json = JSON.parse(response.body)
+
+      expect(final_json["status"]).to eq(AmazonSnsSubscription.statuses[:enabled])
+    end
   end
 
-  context '#disable' do
+  describe '#disable' do
     it 'marks a subscription as disabled' do
       post '/amazon-sns/subscribe.json', params: {
         token: "123123123123",

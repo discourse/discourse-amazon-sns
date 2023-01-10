@@ -14,7 +14,7 @@ export default {
       postRNWebviewMessage("authenticated", 1);
 
       let appEvents = container.lookup("app-events:main");
-      appEvents.on("page:changed", (data) => {
+      appEvents.on("page:changed", () => {
         let badgeCount =
           currentUser.unread_notifications +
           currentUser.unread_private_messages;
@@ -29,9 +29,9 @@ export default {
         ajax("/amazon-sns/subscribe.json", {
           type: "POST",
           data: {
-            token: token,
-            platform: platform,
-            application_name: application_name,
+            token,
+            platform,
+            application_name,
           },
         }).then((result) => {
           postRNWebviewMessage("subscribe completed", result.endpoint_arn);
@@ -45,9 +45,9 @@ export default {
         ajax("/amazon-sns/subscribe.json", {
           type: "POST",
           data: {
-            token: token,
-            platform: platform,
-            application_name: application_name,
+            token,
+            platform,
+            application_name,
           },
         }).then((result) => {
           postRNWebviewMessage("subscribedToken", result);
@@ -57,7 +57,7 @@ export default {
         ajax("/amazon-sns/disable.json", {
           type: "POST",
           data: {
-            token: token,
+            token,
           },
         }).then((result) => {
           postRNWebviewMessage("disabledToken", result);
