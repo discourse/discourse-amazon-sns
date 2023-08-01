@@ -1,6 +1,5 @@
 import { ajax } from "discourse/lib/ajax";
 import { postRNWebviewMessage } from "discourse/lib/utilities";
-import User from "discourse/models/user";
 
 export default {
   name: "message-react-native-app",
@@ -22,22 +21,6 @@ export default {
         postRNWebviewMessage("badgeCount", badgeCount);
       });
     }
-
-    // TODO: remove this legacy call in December 2020 (app should use window.SNS calls below)
-    User.reopenClass({
-      subscribeDeviceToken(token, platform, application_name) {
-        ajax("/amazon-sns/subscribe.json", {
-          type: "POST",
-          data: {
-            token,
-            platform,
-            application_name,
-          },
-        }).then((result) => {
-          postRNWebviewMessage("subscribe completed", result.endpoint_arn);
-        });
-      },
-    });
 
     // called by webview
     window.SNS = {

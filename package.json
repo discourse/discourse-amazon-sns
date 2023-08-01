@@ -1,10 +1,10 @@
 {
-  "name": "discourse",
-  "version": "1.0.0",
-  "repository": "git@github.com:discourse/discourse-assign.git",
+  "name": "discourse-amazon-sns",
+  "version": "0.1.0",
+  "repository": "https://github.com/discourse/discourse-amazon-sns",
   "author": "Discourse",
   "license": "MIT",
   "devDependencies": {
-    "eslint-config-discourse": "^3.3.0"
+    "eslint-config-discourse": "^3.5.0"
   }
 }

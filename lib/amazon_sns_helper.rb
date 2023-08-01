@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'aws-sdk-sns'
+require "aws-sdk-sns"
 
 class AmazonSnsHelper
   def self.sns_client(client = nil)
@@ -14,19 +14,24 @@ class AmazonSnsHelper
     opts[:region] = SiteSetting.amazon_sns_region if SiteSetting.amazon_sns_region
 
     @client = client || Aws::SNS::Client.new(opts)
-
   end
 
   def self.create_endpoint(token: "", platform: "ios")
-    platform_application_arn = platform == "ios" ?
-      SiteSetting.amazon_sns_apns_application_arn :
-      SiteSetting.amazon_sns_gcm_application_arn
+    platform_application_arn =
+      (
+        if platform == "ios"
+          SiteSetting.amazon_sns_apns_application_arn
+        else
+          SiteSetting.amazon_sns_gcm_application_arn
+        end
+      )
 
     begin
-      response = sns_client.create_platform_endpoint(
-        platform_application_arn: platform_application_arn,
-        token: token
-      )
+      response =
+        sns_client.create_platform_endpoint(
+          platform_application_arn: platform_application_arn,
+          token: token,
+        )
     rescue Aws::SNS::Errors::ServiceError => e
       Rails.logger.error(e)
       return false
@@ -54,23 +59,24 @@ class AmazonSnsHelper
     iphone_notification = {
       aps: {
         alert: message,
-        badge: unread
+        badge: unread,
       },
-      url: "#{Discourse.base_url_no_prefix}#{payload[:post_url]}"
+      url: "#{Discourse.base_url_no_prefix}#{payload[:post_url]}",
     }
 
     sns_payload = {
       default: message,
       APNS_SANDBOX: iphone_notification.to_json,
-      APNS: iphone_notification.to_json
+      APNS: iphone_notification.to_json,
     }
 
     begin
-      resp = sns_client.publish(
-        target_arn: target_arn,
-        message: sns_payload.to_json,
-        message_structure: "json"
-      )
+      resp =
+        sns_client.publish(
+          target_arn: target_arn,
+          message: sns_payload.to_json,
+          message_structure: "json",
+        )
     rescue Aws::SNS::Errors::EndpointDisabled => e
       # mark local record disabled, only used for statistical purposes
       # if user launches again, app will delete row and resubscribe in SNS
@@ -82,7 +88,6 @@ class AmazonSnsHelper
         destroy_arn_subscriptions(target_arn)
       end
     end
-
   end
 
   def self.publish_android(target_arn, payload)
@@ -91,24 +96,23 @@ class AmazonSnsHelper
     android_notification = {
       data: {
         message: message,
-        url: "#{Discourse.base_url_no_prefix}#{payload[:post_url]}"
+        url: "#{Discourse.base_url_no_prefix}#{payload[:post_url]}",
       },
       notification: {
         title: payload[:topic_title],
-        body: message
-      }
+        body: message,
+      },
     }
 
-    sns_payload = {
-      gcm: android_notification.to_json
-    }
+    sns_payload = { gcm: android_notification.to_json }
 
     begin
-      resp = sns_client.publish(
-        target_arn: target_arn,
-        message: sns_payload.to_json,
-        message_structure: "json"
-      )
+      resp =
+        sns_client.publish(
+          target_arn: target_arn,
+          message: sns_payload.to_json,
+          message_structure: "json",
+        )
     rescue Aws::SNS::Errors::EndpointDisabled => e
       # mark local record disabled, only used for statistical purposes
       # if user launches again, app will delete row and resubscribe in SNS
@@ -123,11 +127,10 @@ class AmazonSnsHelper
   end
 
   def self.disable_arn_subscriptions(target_arn)
-    AmazonSnsSubscription.where(endpoint_arn: target_arn)
-      .update_all(
-        status: AmazonSnsSubscription.statuses[:disabled],
-        status_changed_at: Time.zone.now
-      )
+    AmazonSnsSubscription.where(endpoint_arn: target_arn).update_all(
+      status: AmazonSnsSubscription.statuses[:disabled],
+      status_changed_at: Time.zone.now,
+    )
   end
 
   def self.destroy_arn_subscriptions(target_arn)
@@ -135,47 +138,55 @@ class AmazonSnsHelper
   end
 
   def self.test_publish_ios
-    target_arn = "arn:aws:sns:us-east-1:638650587766:endpoint/APNS_SANDBOX/PeshkuTestAppleDev/d36b414a-aad8-3562-afe1-f4ad6a20d0c3"
-    iphone_notification = { aps: { alert: "@user1: Hey there Apple dude", badge: 1 }, url: "http://www.amazon.com" }
+    target_arn =
+      "arn:aws:sns:us-east-1:638650587766:endpoint/APNS_SANDBOX/PeshkuTestAppleDev/d36b414a-aad8-3562-afe1-f4ad6a20d0c3"
+    iphone_notification = {
+      aps: {
+        alert: "@user1: Hey there Apple dude",
+        badge: 1,
+      },
+      url: "http://www.amazon.com",
+    }
 
     sns_payload = {
       default: "Hey hey hey there",
       APNS_SANDBOX: iphone_notification.to_json, # needed for testing with dev certificate
-      APNS: iphone_notification.to_json
+      APNS: iphone_notification.to_json,
     }
 
     puts sns_payload.to_json
 
-    resp = sns_client.publish(
-      target_arn: target_arn,
-      message: sns_payload.to_json,
-      message_structure: "json"
-    )
+    resp =
+      sns_client.publish(
+        target_arn: target_arn,
+        message: sns_payload.to_json,
+        message_structure: "json",
+      )
   end
 
   def self.test_publish_android
-    target_arn = "arn:aws:sns:us-east-1:638650587766:endpoint/GCM/IgniteAndroid/b517d11d-f5e4-34bc-9c7e-1d36c77f5a72"
+    target_arn =
+      "arn:aws:sns:us-east-1:638650587766:endpoint/GCM/IgniteAndroid/b517d11d-f5e4-34bc-9c7e-1d36c77f5a72"
     android_notification = {
       data: {
         message: "@user1: Hey there Android dude",
-        url: "http://www.amazon.com"
+        url: "http://www.amazon.com",
       },
       notification: {
         title: "Notification title",
-        body: "@user1: Hey there Android dude not. body"
-      }
+        body: "@user1: Hey there Android dude not. body",
+      },
     }
 
-    sns_payload = {
-      gcm: android_notification.to_json
-    }
+    sns_payload = { gcm: android_notification.to_json }
 
     puts sns_payload.to_json
 
-    resp = sns_client.publish(
-      target_arn: target_arn,
-      message: sns_payload.to_json,
-      message_structure: "json"
-    )
+    resp =
+      sns_client.publish(
+        target_arn: target_arn,
+        message: sns_payload.to_json,
+        message_structure: "json",
+      )
   end
 end
