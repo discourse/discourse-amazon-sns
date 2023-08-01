@@ -7,7 +7,7 @@ class ::AmazonSnsSubscriptionController < ::ApplicationController
     token = params.require(:token)
     application_name = params.require(:application_name)
     platform = params.require(:platform)
-    if ["ios", "android"].exclude?(platform)
+    if %w[ios android].exclude?(platform)
       raise Discourse::InvalidParameters, "Platform parameter should be ios or android."
     end
 
@@ -18,14 +18,12 @@ class ::AmazonSnsSubscriptionController < ::ApplicationController
 
       if endpoint_attrs && endpoint_attrs["Enabled"] == "true"
         existing_record = true
-        if record.user_id != current_user.id
-          record.update(user_id: current_user.id)
-        end
+        record.update(user_id: current_user.id) if record.user_id != current_user.id
 
         if record.status == AmazonSnsSubscription.statuses[:disabled]
           record.update(
             status: AmazonSnsSubscription.statuses[:enabled],
-            status_changed_at: Time.zone.now
+            status_changed_at: Time.zone.now,
           )
         end
       else
@@ -37,18 +35,17 @@ class ::AmazonSnsSubscriptionController < ::ApplicationController
 
     unless existing_record
       endpoint_arn = AmazonSnsHelper.create_endpoint(token: token, platform: platform)
-      unless endpoint_arn
-        return render json: { errors: ["Missing endpoint_arn."] }, status: 422
-      end
+      return render json: { errors: ["Missing endpoint_arn."] }, status: 422 unless endpoint_arn
 
-      record = AmazonSnsSubscription.create!(
-        user_id: current_user.id,
-        device_token: token,
-        application_name: application_name,
-        platform: platform,
-        endpoint_arn: endpoint_arn,
-        status_changed_at: Time.zone.now
-      )
+      record =
+        AmazonSnsSubscription.create!(
+          user_id: current_user.id,
+          device_token: token,
+          application_name: application_name,
+          platform: platform,
+          endpoint_arn: endpoint_arn,
+          status_changed_at: Time.zone.now,
+        )
     end
 
     render json: record
@@ -59,7 +56,7 @@ class ::AmazonSnsSubscriptionController < ::ApplicationController
     if record = AmazonSnsSubscription.where(device_token: token).first
       record.update(
         status: AmazonSnsSubscription.statuses[:disabled],
-        status_changed_at: Time.zone.now
+        status_changed_at: Time.zone.now,
       )
 
       render json: record

@@ -12,6 +12,5 @@ class CreateAmazonSnsSubscription < ActiveRecord::Migration[5.1]
     end
 
     add_index :amazon_sns_subscriptions, [:device_token], unique: true
-
   end
 end
