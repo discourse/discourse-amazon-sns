@@ -139,13 +139,13 @@ class AmazonSnsHelper
 
   def self.test_publish_ios
     target_arn =
-      "arn:aws:sns:us-east-1:638650587766:endpoint/APNS_SANDBOX/PeshkuTestAppleDev/d36b414a-aad8-3562-afe1-f4ad6a20d0c3"
+      "arn:aws:sns:us-east-1:123456789012:endpoint/APNS_SANDBOX/AppleTest/c3fbd2be-3093-11ee-be56-0242ac120002"
     iphone_notification = {
       aps: {
         alert: "@user1: Hey there Apple dude",
         badge: 1,
       },
-      url: "http://www.amazon.com",
+      url: "http://www.example.com",
     }
 
     sns_payload = {
@@ -166,11 +166,11 @@ class AmazonSnsHelper
 
   def self.test_publish_android
     target_arn =
-      "arn:aws:sns:us-east-1:638650587766:endpoint/GCM/IgniteAndroid/b517d11d-f5e4-34bc-9c7e-1d36c77f5a72"
+      "arn:aws:sns:us-east-1:987654321098:endpoint/GCM/AndroidTest/f6d9c22c-3093-11ee-be56-0242ac120002"
     android_notification = {
       data: {
         message: "@user1: Hey there Android dude",
-        url: "http://www.amazon.com",
+        url: "http://www.example.com",
       },
       notification: {
         title: "Notification title",
