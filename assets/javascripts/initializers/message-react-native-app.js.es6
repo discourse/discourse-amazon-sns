@@ -17,7 +17,7 @@ export default {
       appEvents.on("page:changed", () => {
         let badgeCount =
           currentUser.unread_notifications +
-          currentUser.unread_private_messages;
+          currentUser.unread_high_priority_notifications;
 
         postRNWebviewMessage("badgeCount", badgeCount);
       });
