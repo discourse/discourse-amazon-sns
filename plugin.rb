@@ -21,7 +21,7 @@ after_initialize do
 
   User.class_eval { has_many :amazon_sns_subscriptions, dependent: :delete_all }
 
-  DiscourseEvent.on(:post_notification_alert) do |user, payload|
+  DiscourseEvent.on(:push_notification) do |user, payload|
     if user.amazon_sns_subscriptions.exists?
       unread_total = user.unread_notifications + user.unread_high_priority_notifications
       Jobs.enqueue(

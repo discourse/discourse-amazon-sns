@@ -99,7 +99,7 @@ class AmazonSnsHelper
         url: "#{Discourse.base_url_no_prefix}#{payload[:post_url]}",
       },
       notification: {
-        title: payload[:topic_title],
+        title: payload[:topic_title] || payload[:translated_title],
         body: message,
       },
     }
