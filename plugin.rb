@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# name: discourse-amazon-sns-pns
+# name: discourse-amazon-sns
 # about: Enables push notifications via Amazon SNS. To be used in conjunction with a mobile app.
 # version: 0.1
 # authors: Penar Musaraj
