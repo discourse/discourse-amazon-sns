@@ -6,13 +6,13 @@ export default {
   after: "inject-objects",
 
   initialize(container) {
-    const currentUser = container.lookup("current-user:main");
-    const caps = container.lookup("capabilities:main");
+    const currentUser = container.lookup("service:current-user");
+    const caps = container.lookup("service:capabilities");
 
     if (caps.isAppWebview && currentUser) {
       postRNWebviewMessage("authenticated", 1);
 
-      let appEvents = container.lookup("app-events:main");
+      let appEvents = container.lookup("service:app-events");
       appEvents.on("page:changed", () => {
         let badgeCount =
           currentUser.unread_notifications +
