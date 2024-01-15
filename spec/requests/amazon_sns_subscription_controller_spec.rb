@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "rails_helper"
 require File.expand_path("../../../lib/amazon_sns_helper.rb", __FILE__)
 
 RSpec.describe AmazonSnsSubscriptionController do
