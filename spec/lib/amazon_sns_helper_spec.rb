@@ -34,14 +34,14 @@ RSpec.describe AmazonSnsHelper do
     end
 
     it "disables the subscription and deletes the endpoint for publish_ios" do
-      described_class.publish_ios("sample:arn2", {}, true)
+      described_class.publish_ios(user, "sample:arn2", {}, true)
       subscription.reload
       expect(subscription.status).to eq(AmazonSnsSubscription.statuses[:disabled])
       expect(subscription.status_changed_at).not_to eq(nil)
     end
 
     it "disables the subscription and deletes the endpoint for publish_android" do
-      described_class.publish_android("sample:arn2", {})
+      described_class.publish_android(user, "sample:arn2", {})
       subscription.reload
       expect(subscription.status).to eq(AmazonSnsSubscription.statuses[:disabled])
       expect(subscription.status_changed_at).not_to eq(nil)
@@ -57,12 +57,12 @@ RSpec.describe AmazonSnsHelper do
     end
 
     it "destroys the subscription for publish_ios" do
-      described_class.publish_ios("sample:arn2", {}, true)
+      described_class.publish_ios(user, "sample:arn2", {}, true)
       expect(AmazonSnsSubscription.find_by(id: subscription.id)).to eq(nil)
     end
 
     it "destroys the subscription for publish_android" do
-      described_class.publish_android("sample:arn2", {})
+      described_class.publish_android(user, "sample:arn2", {})
       expect(AmazonSnsSubscription.find_by(id: subscription.id)).to eq(nil)
     end
   end

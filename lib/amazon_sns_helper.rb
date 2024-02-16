@@ -53,16 +53,11 @@ class AmazonSnsHelper
     sns_client.delete_endpoint(endpoint_arn: arn)
   end
 
-  def self.publish_ios(target_arn, payload, unread)
+  def self.publish_ios(user, target_arn, payload, unread)
     message = "@#{payload[:username]}: #{payload[:excerpt]}"
+    url = "#{Discourse.base_url_no_prefix}#{payload[:post_url]}"
 
-    iphone_notification = {
-      aps: {
-        alert: message,
-        badge: unread,
-      },
-      url: "#{Discourse.base_url_no_prefix}#{payload[:post_url]}",
-    }
+    iphone_notification = { aps: { alert: message, badge: unread }, url: url }
 
     sns_payload = {
       default: message,
@@ -77,6 +72,7 @@ class AmazonSnsHelper
           message: sns_payload.to_json,
           message_structure: "json",
         )
+      DiscourseEvent.trigger(:push_notification_sent, user, { url: url, type: "sns" })
     rescue Aws::SNS::Errors::EndpointDisabled => e
       # mark local record disabled, only used for statistical purposes
       # if user launches again, app will delete row and resubscribe in SNS
@@ -90,13 +86,14 @@ class AmazonSnsHelper
     end
   end
 
-  def self.publish_android(target_arn, payload)
+  def self.publish_android(user, target_arn, payload)
     message = "@#{payload[:username]}: #{payload[:excerpt]}"
 
+    url = "#{Discourse.base_url_no_prefix}#{payload[:post_url]}"
     android_notification = {
       data: {
         message: message,
-        url: "#{Discourse.base_url_no_prefix}#{payload[:post_url]}",
+        url: url,
       },
       notification: {
         title: payload[:topic_title] || payload[:translated_title],
@@ -113,6 +110,7 @@ class AmazonSnsHelper
           message: sns_payload.to_json,
           message_structure: "json",
         )
+      DiscourseEvent.trigger(:push_notification_sent, user, { url: url, type: "sns" })
     rescue Aws::SNS::Errors::EndpointDisabled => e
       # mark local record disabled, only used for statistical purposes
       # if user launches again, app will delete row and resubscribe in SNS
