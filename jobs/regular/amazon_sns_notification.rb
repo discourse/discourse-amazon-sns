@@ -11,9 +11,9 @@ module Jobs
         next if subscription.status == AmazonSnsSubscription.statuses[:disabled]
 
         if subscription.platform == "ios"
-          AmazonSnsHelper.publish_ios(subscription.endpoint_arn, payload, unread)
+          AmazonSnsHelper.publish_ios(user, subscription.endpoint_arn, payload, unread)
         else
-          AmazonSnsHelper.publish_android(subscription.endpoint_arn, payload)
+          AmazonSnsHelper.publish_android(user, subscription.endpoint_arn, payload)
         end
       end
     end
