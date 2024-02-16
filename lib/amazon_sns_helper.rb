@@ -72,7 +72,7 @@ class AmazonSnsHelper
           message: sns_payload.to_json,
           message_structure: "json",
         )
-      DiscourseEvent.trigger(:push_notification_sent, user, { url: url })
+      DiscourseEvent.trigger(:push_notification_sent, user, { url: url, type: "sns" })
     rescue Aws::SNS::Errors::EndpointDisabled => e
       # mark local record disabled, only used for statistical purposes
       # if user launches again, app will delete row and resubscribe in SNS
@@ -110,7 +110,7 @@ class AmazonSnsHelper
           message: sns_payload.to_json,
           message_structure: "json",
         )
-      DiscourseEvent.trigger(:push_notification_sent, user, { url: url })
+      DiscourseEvent.trigger(:push_notification_sent, user, { url: url, type: "sns" })
     rescue Aws::SNS::Errors::EndpointDisabled => e
       # mark local record disabled, only used for statistical purposes
       # if user launches again, app will delete row and resubscribe in SNS
