@@ -92,7 +92,7 @@ class AmazonSnsHelper
     url = "#{Discourse.base_url_no_prefix}#{payload[:post_url]}"
     android_notification = {
       data: {
-        message: message,
+        message: message(payload),
         url: url,
       },
       notification: {
@@ -122,6 +122,12 @@ class AmazonSnsHelper
         destroy_arn_subscriptions(target_arn)
       end
     end
+  end
+
+  def self.message(payload)
+    message = "@#{payload[:username]}: #{payload[:excerpt]}"
+    message = DiscoursePluginRegistry.apply_modifier(:amazon_sns_message, message, payload)
+    message
   end
 
   def self.disable_arn_subscriptions(target_arn)
