@@ -92,7 +92,7 @@ class AmazonSnsHelper
     url = "#{Discourse.base_url_no_prefix}#{payload[:post_url]}"
     android_notification = {
       data: {
-        message: message(payload),
+        message: message,
         url: url,
       },
       notification: {
