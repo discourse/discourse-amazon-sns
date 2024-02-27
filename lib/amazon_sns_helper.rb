@@ -54,7 +54,7 @@ class AmazonSnsHelper
   end
 
   def self.publish_ios(user, target_arn, payload, unread)
-    message = "@#{payload[:username]}: #{payload[:excerpt]}"
+    message = generate_message(payload)
     url = "#{Discourse.base_url_no_prefix}#{payload[:post_url]}"
 
     iphone_notification = { aps: { alert: message, badge: unread }, url: url }
@@ -87,7 +87,7 @@ class AmazonSnsHelper
   end
 
   def self.publish_android(user, target_arn, payload)
-    message = "@#{payload[:username]}: #{payload[:excerpt]}"
+    message = generate_message(payload)
 
     url = "#{Discourse.base_url_no_prefix}#{payload[:post_url]}"
     android_notification = {
@@ -122,6 +122,12 @@ class AmazonSnsHelper
         destroy_arn_subscriptions(target_arn)
       end
     end
+  end
+
+  def self.generate_message(payload)
+    message = "@#{payload[:username]}: #{payload[:excerpt]}"
+    message = DiscoursePluginRegistry.apply_modifier(:amazon_sns_message, message, payload)
+    message
   end
 
   def self.disable_arn_subscriptions(target_arn)
