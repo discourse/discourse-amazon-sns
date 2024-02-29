@@ -23,6 +23,11 @@ after_initialize do
 
   DiscourseEvent.on(:push_notification) do |user, payload|
     if user.amazon_sns_subscriptions.exists?
+      send_notification =
+        DiscoursePluginRegistry.apply_modifier(:amazon_sns_send_notification, true, user, payload)
+
+      next if !send_notification
+
       unread_total = user.unread_notifications + user.unread_high_priority_notifications
       Jobs.enqueue(
         :amazon_sns_notification,
