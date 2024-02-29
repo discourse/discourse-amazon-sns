@@ -23,14 +23,8 @@ after_initialize do
 
   DiscourseEvent.on(:push_notification) do |user, payload|
     if user.amazon_sns_subscriptions.exists?
-      send_notification = true
       send_notification =
-        DiscoursePluginRegistry.apply_modifier(
-          :amazon_sns_send_notification,
-          send_notification,
-          user,
-          payload,
-        )
+        DiscoursePluginRegistry.apply_modifier(:amazon_sns_send_notification, true, user, payload)
 
       next if !send_notification
 
