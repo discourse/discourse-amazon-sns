@@ -54,7 +54,7 @@ class AmazonSnsHelper
   end
 
   def self.publish_ios(user, target_arn, payload, unread)
-    message = generate_message(payload)
+    message = generate_message(payload, user)
     url = "#{Discourse.base_url_no_prefix}#{payload[:post_url]}"
 
     iphone_notification = { aps: { alert: message, badge: unread }, url: url }
@@ -87,7 +87,7 @@ class AmazonSnsHelper
   end
 
   def self.publish_android(user, target_arn, payload)
-    message = generate_message(payload)
+    message = generate_message(payload, user)
 
     url = "#{Discourse.base_url_no_prefix}#{payload[:post_url]}"
     android_notification = {
@@ -124,9 +124,11 @@ class AmazonSnsHelper
     end
   end
 
-  def self.generate_message(payload)
+  def self.generate_message(payload, user)
     message = "@#{payload[:username]}: #{payload[:excerpt]}"
-    message = DiscoursePluginRegistry.apply_modifier(:amazon_sns_message, message, payload)
+    I18n.with_locale(user.effective_locale) do
+      message = DiscoursePluginRegistry.apply_modifier(:amazon_sns_message, message, payload)
+    end
     message
   end
 
