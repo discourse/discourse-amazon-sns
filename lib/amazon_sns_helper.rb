@@ -126,10 +126,10 @@ class AmazonSnsHelper
 
   def self.generate_message(payload, user)
     message = "@#{payload[:username]}: #{payload[:excerpt]}"
+
     I18n.with_locale(user.effective_locale) do
-      message = DiscoursePluginRegistry.apply_modifier(:amazon_sns_message, message, payload)
+      DiscoursePluginRegistry.apply_modifier(:amazon_sns_message, message, payload)
     end
-    message
   end
 
   def self.disable_arn_subscriptions(target_arn)
