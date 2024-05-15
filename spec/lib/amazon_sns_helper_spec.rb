@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe AmazonSnsHelper do
-  fab!(:user) { Fabricate(:user) }
+  fab!(:user)
   let!(:subscription) do
     AmazonSnsSubscription.create!(
       user_id: user.id,

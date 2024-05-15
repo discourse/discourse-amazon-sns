@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ::AmazonSnsSubscriptionController < ::ApplicationController
+  requires_plugin DiscourseAmazonSns::PLUGIN_NAME
+
   before_action :ensure_logged_in
 
   def create
