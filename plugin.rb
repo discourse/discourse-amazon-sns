@@ -17,6 +17,7 @@ after_initialize do
   require_relative "app/models/amazon_sns_subscription"
   require_relative "lib/amazon_sns_helper"
   require_relative "lib/user_extension"
+  require_relative "app/serializers/amazon_sns_subscription_serializer"
   require_relative "jobs/regular/amazon_sns_notification"
 
   Discourse::Application.routes.append do
