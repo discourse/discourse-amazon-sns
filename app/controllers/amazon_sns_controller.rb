@@ -50,7 +50,7 @@ class ::AmazonSnsSubscriptionController < ::ApplicationController
         )
     end
 
-    render json: record
+    render_serialized(record, AmazonSnsSubscriptionSerializer, root: false)
   end
 
   def disable
@@ -61,7 +61,7 @@ class ::AmazonSnsSubscriptionController < ::ApplicationController
         status_changed_at: Time.zone.now,
       )
 
-      render json: record
+      render_serialized(record, AmazonSnsSubscriptionSerializer, root: false)
       return
     end
 
