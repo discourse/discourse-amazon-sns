@@ -20,9 +20,10 @@ end
 #  endpoint_arn      :string           not null
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
-#  status            :integer          not null
+#  status            :integer          default(1), not null
 #  status_changed_at :datetime
 #
 # Indexes
 #
 #  index_amazon_sns_subscriptions_on_device_token  (device_token) UNIQUE
+#
