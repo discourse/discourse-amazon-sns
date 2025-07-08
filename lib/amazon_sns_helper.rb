@@ -57,6 +57,10 @@ class AmazonSnsHelper
     message = generate_message(payload, user)
     url = "#{Discourse.base_url_no_prefix}#{payload[:post_url]}"
 
+    message = { title: payload[:title], body: payload[:body] } if payload[
+      :use_title_and_body_for_ios
+    ]
+
     iphone_notification = { aps: { alert: message, badge: unread }, url: url }
 
     sns_payload = {
