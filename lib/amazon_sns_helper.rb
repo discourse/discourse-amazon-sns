@@ -57,9 +57,7 @@ class AmazonSnsHelper
     message = generate_message(payload, user)
     url = "#{Discourse.base_url_no_prefix}#{payload[:post_url]}"
 
-    message = { title: payload[:title], body: payload[:body] } if payload[
-      :use_title_and_body_for_ios
-    ]
+    message = { title: payload[:title], body: payload[:body] } if payload[:use_title_and_body]
 
     iphone_notification = { aps: { alert: message, badge: unread }, url: url }
 
@@ -91,19 +89,34 @@ class AmazonSnsHelper
   end
 
   def self.publish_android(user, target_arn, payload)
-    message = generate_message(payload, user)
-
     url = "#{Discourse.base_url_no_prefix}#{payload[:post_url]}"
-    android_notification = {
-      data: {
-        message: message,
-        url: url,
-      },
-      notification: {
-        title: payload[:topic_title] || payload[:translated_title],
-        body: message,
-      },
-    }
+
+    android_notification =
+      if payload[:use_title_and_body]
+        {
+          data: {
+            message: payload[:body],
+            url: url,
+          },
+          notification: {
+            title: payload[:title],
+            body: payload[:body],
+          },
+        }
+      else
+        message = generate_message(payload, user)
+
+        {
+          data: {
+            message: message,
+            url: url,
+          },
+          notification: {
+            title: payload[:topic_title] || payload[:translated_title],
+            body: message,
+          },
+        }
+      end
 
     sns_payload = { gcm: android_notification.to_json }
 
