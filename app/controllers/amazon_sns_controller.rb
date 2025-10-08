@@ -37,7 +37,9 @@ class ::AmazonSnsSubscriptionController < ::ApplicationController
 
     unless existing_record
       endpoint_arn = AmazonSnsHelper.create_endpoint(token: token, platform: platform)
-      return render json: { errors: ["Missing endpoint_arn."] }, status: 422 unless endpoint_arn
+      unless endpoint_arn
+        return render json: { errors: ["Missing endpoint_arn."] }, status: :unprocessable_content
+      end
 
       record =
         AmazonSnsSubscription.create!(
