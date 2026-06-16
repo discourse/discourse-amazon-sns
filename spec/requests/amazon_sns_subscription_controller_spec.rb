@@ -209,6 +209,42 @@ RSpec.describe AmazonSnsSubscriptionController do
   end
 
   describe "#disable" do
+    it "omits push endpoint details from token-based responses" do
+      token = "123123123123"
+
+      post "/amazon-sns/subscribe.json",
+           params: {
+             token: token,
+             application_name: "Penar's phone",
+             platform: "ios",
+           }
+
+      expect(response.status).to eq(200)
+      create_json = response.parsed_body
+      subscription = user.amazon_sns_subscriptions.find_by!(device_token: token)
+
+      expect(create_json.keys).to contain_exactly(
+        "id",
+        "user_id",
+        "application_name",
+        "platform",
+        "created_at",
+        "updated_at",
+        "status",
+        "status_changed_at",
+      )
+      expect(response.body).not_to include(subscription.device_token)
+      expect(response.body).not_to include(subscription.endpoint_arn)
+
+      post "/amazon-sns/disable.json", params: { token: token }
+
+      expect(response.status).to eq(200)
+      expect(response.parsed_body).to eq(
+        "id" => subscription.id,
+        "status" => AmazonSnsSubscription.statuses[:disabled],
+      )
+    end
+
     it "marks a subscription as disabled" do
       post "/amazon-sns/subscribe.json",
            params: {

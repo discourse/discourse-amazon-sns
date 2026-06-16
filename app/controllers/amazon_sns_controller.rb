@@ -63,7 +63,7 @@ class ::AmazonSnsSubscriptionController < ::ApplicationController
         status_changed_at: Time.zone.now,
       )
 
-      render_serialized(record, AmazonSnsSubscriptionSerializer, root: false)
+      render json: { id: record.id, status: record.status }
       return
     end
 
